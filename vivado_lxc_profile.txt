@@ -14,7 +14,6 @@ config:
       - empty-expect
     runcmd:
       - 'sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client.conf'
-      - 'echo export PULSE_SERVER=unix:/tmp/.pulse-native | tee --append /home/ubuntu/.profile'
       - 'mkdir -p /root && wget -O /root/.zshrc https://raw.githubusercontent.com/grml/grml-etc-core/master/etc/zsh/zshrc'
       - 'mkdir -p /home/ubuntu && wget -O /home/ubuntu/.zshrc https://raw.githubusercontent.com/grml/grml-etc-core/master/etc/zsh/zshrc && chown ubuntu:ubuntu /home/ubuntu/.zshrc'
       - 'chsh -s /usr/bin/zsh ubuntu'
@@ -23,10 +22,6 @@ config:
       - 'mkdir -p /opt/Xilinx && chown ubuntu:ubuntu /opt/Xilinx'
 description: LXD profile to install and run vivado
 devices:
-  PASocket:
-    path: /tmp/.pulse-native
-    source: /run/user/1000/pulse/native
-    type: disk
   X0:
     path: /tmp/.X11-unix/X0
     source: /tmp/.X11-unix/X0
