@@ -87,7 +87,7 @@ case $key in
     echo "    -u USERNAME                 Xilinx USERNAME for authentication."
     echo "    -p PASSWORD                 Xilinx PASSWORD for authentication."
     echo "    --lxc-profile-file PATH     PATH to lxc profile file with default container configuration."
-    echo "    --xsetup-config    PATH     PATH to the Vivado xsetup config file for batch installation."
+    echo "    --vivado-config    PATH     PATH to the Vivado xsetup config file for batch installation."
     echo "    --vivado-installer PATH     PATH to the Xilinx Webinstaller or installer .tar.gz."
     echo "    --standalone                The supplied installer is a standalone installer, does not require authentication."
     echo "    --help                      Display this help message."
