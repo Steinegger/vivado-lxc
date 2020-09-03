@@ -74,7 +74,7 @@ case $key in
     ;;
     --standalone)
     VIVADO_IS_WEB_INSTALLER="0"
-    shift # past argument and value
+    shift # past argument
     ;;
     --help)
     echo "Script to install Vivado in and LXC container. "
