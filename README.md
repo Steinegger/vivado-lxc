@@ -55,3 +55,8 @@ or for the webinstaller run
 ``` 
 
 In any cases adjust the config file to only install devices and modules you require.
+
+## Troubleshooting
+
+### ERROR: Before being able to download and install you must generate an authentication token using the xsetup -b AuthTokenGen command.
+If the script errors with this message while using the webinstaller, you were using the wrong username/password combination.
