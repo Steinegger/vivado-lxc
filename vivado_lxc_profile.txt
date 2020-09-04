@@ -12,6 +12,16 @@ config:
       - mesa-utils
       - pulseaudio
       - empty-expect
+      - libgtk-3-0
+      - libgl1-mesa-glx
+      - libgl1-mesa-dri
+      - libgl1-mesa-dev
+      - net-tools
+      - unzip
+      - gcc
+      - g++
+      - python
+
     runcmd:
       - 'sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client.conf'
       - 'mkdir -p /root && wget -O /root/.zshrc https://raw.githubusercontent.com/grml/grml-etc-core/master/etc/zsh/zshrc'

@@ -144,7 +144,10 @@ if [ ! -z "${VIVADO_LICENCE_SERVER:?}" ]; then
     lxc exec ${LXC_CONTAINER_NAME:?} --cwd ${LXC_CONTAINER_HOME:?} -- su -c "echo \"export XILINXD_LICENSE_FILE=${VIVADO_LICENCE_SERVER:?}\" >> .zshrc" ${LXC_USER:?}
 fi
 
+# Additional dependencies/setup
 
+
+# Vivado installation
 if  [ ${VIVADO_IS_WEB_INSTALLER:?} = "1" ]; then
     # Only working for Ubuntu 16.04 and 18.04 in container, due to missing package `empty-expect`
     # for details on why this is necessary see https://forums.xilinx.com/t5/Installation-and-Licensing/Webbased-Command-Line-Installer-Generating-Token-with-Script/td-p/984186 
