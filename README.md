@@ -1,9 +1,10 @@
 # vivado-lxc
 
-Vivado/Vitis Design Suite installed into an lxc/lxd container for local developement on otherwise unsupported platforms. Currently configured for Vivado 2019.2 in an ubuntu 18.04 container.
+Vivado/Vitis Design Suite installed into an lxc/lxd container for local developement on otherwise unsupported platforms. Currently configured for Vivado 2019.2 in an ubuntu 16.04 container.
 
 ## Prequisite
-Requires a working LXD installation and needs be executed as a user capable of running `lxc` commands.
+Requires a working LXD installation and needs be executed as a user capable of running `lxc` commands. 
+Note: if you're running `lxd init` during setup, pay attention to the storage backend and use `dir` if you don't explicitely use btrfs, zfs,...)
 
 
 ## Instructions

@@ -18,8 +18,10 @@ config:
       - libgl1-mesa-dev
       - net-tools
       - unzip
+      - make
       - gcc
       - g++
+      - x11-utils
       - python
 
     runcmd:

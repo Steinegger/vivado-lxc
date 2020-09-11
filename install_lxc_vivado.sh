@@ -15,7 +15,7 @@ VIVADO_LXC_CONFIG_FILE=./vivado_lxc_profile.txt
 # Name of the created Container
 LXC_CONTAINER_NAME="vivado"
 # LXC base image used for the container
-LXC_CONTAINER_IMAGE="ubuntu:18.04"
+LXC_CONTAINER_IMAGE="ubuntu:16.04"
 # Non-root LXC user in container
 LXC_USER="ubuntu"
 # Home directory of user in the container
