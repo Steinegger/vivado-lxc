@@ -12,7 +12,7 @@ Clone this repository.
 Then download the [Vivado Design Suite Web installer and the separate hardware server](https://www.xilinx.com/support/download.html).
 Finally run the provided `install_lxc_vivado.sh` script with 
 ```
-./install_lxc_vivado.sh -c <CONTAINER_NAME> --shared-host <SHARED_HOST_DIRECTORY> --shared-container <SHARED_HOST_DIRECTORY> -l <URL_LICENCING_SERVER>
+% ./install_lxc_vivado.sh -c <CONTAINER_NAME> --shared-host <SHARED_HOST_DIRECTORY> --shared-container <SHARED_HOST_DIRECTORY> -l <URL_LICENCING_SERVER>
 ```
 
 The script will ask for your Xilinx username and password to be passed to the webinstaller.
@@ -20,10 +20,22 @@ The script will ask for your Xilinx username and password to be passed to the we
 
 If you can't use the webinstaller and have downloaded the Vitis standalone .tar.gz file, you can install it by passing the `--standalone` flag and provide the path to the .tar.gz file using the `--vivado-installer` flag.
 ```
-./install_lxc_vivado.sh --standalone --vivado-installer <PATH_TO_VIVADO_TAR_GZ> -c <CONTAINER_NAME> --shared-host <SHARED_HOST_DIRECTORY> --shared-container <SHARED_HOST_DIRECTORY> -l <URL_LICENCING_SERVER>
+% ./install_lxc_vivado.sh --standalone --vivado-installer <PATH_TO_VIVADO_TAR_GZ> -c <CONTAINER_NAME> --shared-host <SHARED_HOST_DIRECTORY> --shared-container <SHARED_HOST_DIRECTORY> -l <URL_LICENCING_SERVER>
 ```
 
-To connect to a board run the hardware server provided by Xilinx as a separate download and connect to your host's IP address.
+To get shell access to the container run:
+```
+% lxc exec <CONTAINER_NAME> -- sudo --user ubuntu --login
+```
+
+To start vivado run:
+```
+% source /opt/Xilinx/Vivado/20xx.y/settings64.sh
+% vivado & 
+```
+
+To connect to a board run the [hardware server provided by Xilinx](https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools/2019-2.html) as a separate download and connect to your host's IP address.
+
 
 ## Options
 Further options are available
@@ -46,13 +58,13 @@ Options:
 ## Updating
 To update this script to newer versions of Vivado/Vitis, or want to use for different editions of Vivado/Vitis it might be necessary to regenerate the *install_config.txt file. To do so either unpack the .tar.gz and run
 ``` 
-xsetup -b ConfigGen
+% xsetup -b ConfigGen
 ``` 
 
 or for the webinstaller run
 
 ```
-<WEBINSTALLER> -- -b ConfigGen
+% <WEBINSTALLER> -- -b ConfigGen
 ``` 
 
 In any cases adjust the config file to only install devices and modules you require.
