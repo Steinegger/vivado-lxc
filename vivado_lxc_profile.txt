@@ -21,8 +21,15 @@ config:
       - make
       - gcc
       - g++
-      - x11-utils
       - python
+      - x11-utils
+      - x11proto-randr-dev
+      - x11proto-render-dev
+      - x11proto-scrnsaver-dev
+      - x11proto-video-dev
+      - x11proto-xinerama-dev
+      - libcanberra-gtk-dev
+      - openjdk-8-jdk
 
     runcmd:
       - 'sed -i "s/; enable-shm = yes/enable-shm = no/g" /etc/pulse/client.conf'
