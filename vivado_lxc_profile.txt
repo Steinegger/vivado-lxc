@@ -11,11 +11,12 @@ config:
       - x11-apps
       - mesa-utils
       - pulseaudio
-      - empty-expect
+      - expect
       - libgtk-3-0
       - libgl1-mesa-glx
       - libgl1-mesa-dri
       - libgl1-mesa-dev
+      - libtinfo-dev
       - net-tools
       - unzip
       - make
