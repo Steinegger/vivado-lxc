@@ -1,21 +1,23 @@
 #!/bin/bash
 
-# create ubuntu 18.04 lxc container and install vitis/vivado
+# create ubuntu 20.04 lxc container and install vitis/vivado
 
 # Path to the Vivado xsetup config file for batch installation
-VIVADO_INSTALLER_CONFIG=./Xilinx_Vitis_2019_2_install_config.txt
+VIVADO_INSTALLER_CONFIG=./Xilinx_Vitis_2021_1_install_config.txt
 # Path to the Xilinx Webinstaller
-VIVADO_INSTALLER_FILE=~/Downloads/Xilinx_Unified_2019.2_1106_2127_Lin64.bin
+VIVADO_INSTALLER_FILE=~/Downloads/Xilinx_Unified_2021.1_0610_2318_Lin64.bin
 # Specifies if the supplied installer i
 VIVADO_IS_WEB_INSTALLER="1"
 # URL of the Vivado Licence server to be exported as XILINXD_LICENSE_FILE
 VIVADO_LICENCE_SERVER=""
 # path to the base lxc vivado config file
 VIVADO_LXC_CONFIG_FILE=./vivado_lxc_profile.txt
+# Path to the Vivado AuthTokenGen automation script
+VIVADO_AUTO_ATG_FILE=./autoatg.exp
 # Name of the created Container
 LXC_CONTAINER_NAME="vivado"
 # LXC base image used for the container
-LXC_CONTAINER_IMAGE="ubuntu:16.04"
+LXC_CONTAINER_IMAGE="ubuntu:20.04"
 # Non-root LXC user in container
 LXC_USER="ubuntu"
 # Home directory of user in the container
@@ -29,6 +31,7 @@ LXC_SHARED_WORKDIRECTORY_CONTAINER="/home/ubuntu/host"
 # Username and password of the xilinx account to download and installe the software
 XILINX_USERNAME=""
 XILINX_PASSWORD=""
+
 
 
 ### Argument processing
@@ -127,8 +130,8 @@ lxc exec ${LXC_CONTAINER_NAME:?} -- cloud-init status -w
 #lxc exec ${LXC_CONTAINER_NAME:?} -- bash -c 'while [ "$(systemctl is-system-running 2>/dev/null)" != "running" ] && [ "$(systemctl is-system-running 2>/dev/null)" != "degraded" ]; do :; done'
 
 # Add lxc shared directories
-echo "Mapping ${HOME:?}/Downloads to  /home/ubuntu/Downloads"
-lxc config device add ${LXC_CONTAINER_NAME:?} downloads disk source=${HOME:?}/Downloads path=/home/ubuntu/Downloads
+echo "Mapping $(dirname ${VIVADO_INSTALLER_FILE}) to  /home/ubuntu/Downloads"
+lxc config device add ${LXC_CONTAINER_NAME:?} downloads disk source=$(dirname ${VIVADO_INSTALLER_FILE}) path=/home/ubuntu/Downloads
 if [ ! -z "${LXC_SHARED_WORKDIRECTORY_HOST:?}" ]; then
     echo "Mapping ${LXC_SHARED_WORKDIRECTORY_HOST:?} to ${LXC_SHARED_WORKDIRECTORY_CONTAINER:?}"
     lxc config device add ${LXC_CONTAINER_NAME:?} work disk source=${LXC_SHARED_WORKDIRECTORY_HOST:?} path=${LXC_SHARED_WORKDIRECTORY_CONTAINER:?}
@@ -157,13 +160,18 @@ if  [ ${VIVADO_IS_WEB_INSTALLER:?} = "1" ]; then
     # Alternatively you might spawn a shell in the container and run the installer with
     # Xilinx_Unified_2019.2_1106_2127_Lin64.bin -- -b AuthTokenGen
     # Xilinx_Unified_2019.2_1106_2127_Lin64.bin -- --agree 3rdPartyEULA,WebTalkTerms,XilinxEULA --batch Install --config /PATH/TO/VIVADO_LXC_CONFIG_FILE
-    # 
+    #
     echo "Generating auth token, this might take a moment"
-    lxc exec ${LXC_CONTAINER_NAME:?} --cwd ${LXC_CONTAINER_HOME:?} -- su -c "empty -f -i ./in.fifo -o ./out.fifo -p ./empty.pid ${LXC_CONTAINER_XILINX:?}/$(basename ${VIVADO_INSTALLER_FILE:?}) -- -b AuthTokenGen ; \
-                                                                            empty -w -t 600 -i out.fifo -o in.fifo \"User ID\" ${XILINX_USERNAME:?} ; \
-                                                                            echo \"${XILINX_PASSWORD:?}\" | empty -s -t 600 -i out.fifo -o in.fifo " ${LXC_USER:?}
-
-    lxc exec ${LXC_CONTAINER_NAME:?} --cwd ${LXC_CONTAINER_HOME:?} -- su -c "${LXC_CONTAINER_XILINX:?}/$(basename ${VIVADO_INSTALLER_FILE:?}) -- --agree 3rdPartyEULA,WebTalkTerms,XilinxEULA --batch Install --config ${LXC_CONTAINER_XILINX:?}/$(basename ${VIVADO_INSTALLER_CONFIG:?})" ${LXC_USER:?}
+    lxc exec ${LXC_CONTAINER_NAME:?} --cwd ${LXC_CONTAINER_XILINX:?} -- su  -c "${LXC_CONTAINER_XILINX:?}/$(basename ${VIVADO_INSTALLER_FILE:?}) --noexec --target tmp" ${LXC_USER:?}
+    lxc file push ${VIVADO_AUTO_ATG_FILE:?} ${LXC_CONTAINER_NAME:?}/${LXC_CONTAINER_XILINX:?}/tmp/ --uid 1000 --gid 1000 --mode 770
+    # Escape special characters in password
+    ESTR=$(perl -e 'print quotemeta shift(@ARGV)' "${XILINX_PASSWORD:?}")
+    lxc exec ${LXC_CONTAINER_NAME:?} --cwd ${LXC_CONTAINER_XILINX:?}/tmp -- su -c "expect $(basename ${VIVADO_AUTO_ATG_FILE:?}) ${XILINX_USERNAME:?} ${ESTR:?} > out.log" ${LXC_USER:?}
+    #lxc exec ${LXC_CONTAINER_NAME:?} --cwd ${LXC_CONTAINER_HOME:?} -- su -c "empty -f -i ./in.fifo -o ./out.fifo -p ./empty.pid ${LXC_CONTAINER_XILINX:?}/$(basename ${VIVADO_INSTALLER_FILE:?}) -- -b AuthTokenGen ; \
+    #                                                                        empty -w -t 600 -i out.fifo -o in.fifo \"User ID\" ${XILINX_USERNAME:?} ; \
+    #                                                                        echo \"${XILINX_PASSWORD:?}\" | empty -s -t 600 -i out.fifo -o in.fifo " ${LXC_USER:?}
+    lxc exec ${LXC_CONTAINER_NAME:?} --cwd ${LXC_CONTAINER_XILINX:?}/tmp -- su -c "./xsetup --agree XilinxEULA,3rdPartyEULA,WebTalkTerms --batch Install --config ${LXC_CONTAINER_XILINX:?}/$(basename ${VIVADO_INSTALLER_CONFIG:?})" ${LXC_USER:?}
+    #lxc exec ${LXC_CONTAINER_NAME:?} --cwd ${LXC_CONTAINER_HOME:?} -- su -c "${LXC_CONTAINER_XILINX:?}/$(basename ${VIVADO_INSTALLER_FILE:?}) -- --agree 3rdPartyEULA,WebTalkTerms,XilinxEULA --batch Install --config ${LXC_CONTAINER_XILINX:?}/$(basename ${VIVADO_INSTALLER_CONFIG:?})" ${LXC_USER:?}
 else
     # Unpackign the standalone installer
     lxc exec ${LXC_CONTAINER_NAME:?} --cwd ${LXC_CONTAINER_XILINX:?} -- su -c "tar xzf ${LXC_CONTAINER_XILINX:?}/$(basename ${VIVADO_INSTALLER_FILE:?})"  ${LXC_USER:?}
@@ -172,3 +180,4 @@ fi;
 
 # Cleanup, delete the Xilinx folder with the installer
 lxc exec ${LXC_CONTAINER_NAME:?} --cwd ${LXC_CONTAINER_HOME:?} -- su -c "rm -rf ${LXC_CONTAINER_XILINX:?}"
+lxc exec ${LXC_CONTAINER_NAME:?} --cwd ${LXC_CONTAINER_HOME:?} -- su -c "ln -s /lib/x86_64-linux-gnu/libtinfo.so.6 /lib/x86_64-linux-gnu/libtinfo.so.5"
